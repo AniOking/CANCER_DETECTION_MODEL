@@ -1,0 +1,53 @@
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+%matplotlib inline
+
+from sklearn.preprocessing import MinMaxScaler
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import classification_report, confusion_matrix
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Dense, Dropout
+from tensorflow.keras.callbacks import EarlyStopping, TensorBoard
+
+board=TensorBoard(log_dir="logs\log", histogram_freq=1,
+                 write_graph=True, write_images=True,
+                 embeddings_freq=1)
+
+#Reading csv
+cdata=pd.read_csv("D:\DataScience\TensorFlow_FILES\TensorFlow_FILES\DATA\cancer_classification.csv")
+
+#checking head
+cdata.head()
+
+#Spliting data
+xtrain,xtest,ytrain,ytest=train_test_split(cdata.drop("benign_0__mal_1",axis=1),cdata["benign_0__mal_1"],test_size=0.4)
+
+#Scaler estimator created
+scaler= MinMaxScaler()
+
+#fiting and transforming data
+xtrain=scaler.fit_transform(xtrain)
+xtest=scaler.transform(xtest)
+
+#model created
+model=Sequential()
+
+#Adding neurons to model 
+model.add(Dense(30,activation="relu"))
+model.add(Dropout(0.5))
+model.add(Dense(15,activation="relu"))
+model.add(Dense(8,activation="relu"))
+model.add(Dense(1,activation="sigmoid"))
+
+model.compile(loss="binary_crossentropy",optimizer="adam")
+call= EarlyStopping(monitor="val_loss",mode="min",patience=25)
+
+#fiting data
+model.fit(xtrain, ytrain, epochs=1000, verbose=1, validation_data=(xtest,ytest), callbacks=[call,board])
+
+#Ananlyzing prediction
+pd.DataFrame(model.history.history).plot()
+
+model.save("cancer_detection_model.h5")
