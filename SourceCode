@@ -16,7 +16,7 @@ board=TensorBoard(log_dir="logs\log", histogram_freq=1,
                  embeddings_freq=1)
 
 #Reading csv
-cdata=pd.read_csv("D:\DataScience\TensorFlow_FILES\TensorFlow_FILES\DATA\cancer_classification.csv")
+cdata=pd.read_csv("cancer_classification.csv")
 
 #checking head
 cdata.head()
